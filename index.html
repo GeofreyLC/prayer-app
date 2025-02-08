@@ -180,7 +180,8 @@
      */
     function displayRegion(region) {
       const content = document.getElementById('content');
-      content.innerHTML = ''; // Limpia el contenido anterior
+       content.innerHTML = '<p>Cargando datos...</p>'; // Indicador de carga
+      /*content.innerHTML = ''; // Limpia el contenido anterior*/
       
       // Filtra los registros por la región seleccionada
       const filtered = dataGlobal.filter(item => item.Region === region);
