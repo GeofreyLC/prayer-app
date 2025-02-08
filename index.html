@@ -135,7 +135,7 @@
     <button data-region="NAO">NAO</button>
     <button data-region="Namestan">Namestan</button>
     <button data-region="SESA">SESA</button>
-    <button data-region="LAC">LACCC</button>
+    <button data-region="LAC">LAC</button>
   </nav>
   
   <!-- Área donde se mostrarán los pedidos de oración -->
@@ -224,7 +224,43 @@
      * Función para marcar un pedido como "orando".
      * Envía una petición POST a la API con el número de fila a actualizar.
      */
-    async function markAsOrando(row) {
+
+async function markAsOrando(row) {
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ row: row }),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    const result = await response.json();
+    console.log("Respuesta de la API:", result); // Registro para ver qué devuelve la API
+    
+    if (result.result === "success") {
+      // Actualiza el estado localmente
+      dataGlobal = dataGlobal.map(item => {
+        if (item.row == row) {
+          item.Status = "orando";
+        }
+        return item;
+      });
+      // Si hay una región activa, actualiza la vista
+      const activeRegionButton = document.querySelector('#regions button.active');
+      if (activeRegionButton) {
+        displayRegion(activeRegionButton.dataset.region);
+      }
+      updateProgressBar();
+    } else {
+      alert(result.message);
+    }
+  } catch (error) {
+    console.error('Error al actualizar:', error);
+  }
+}
+
+    
+  /* ORIGINAL  async function markAsOrando(row) {
       try {
         const response = await fetch(API_URL, {
           method: 'POST',
@@ -254,7 +290,7 @@
       } catch (error) {
         console.error('Error al actualizar:', error);
       }
-    }
+    }ORIGINAL*/
     
     /**
      * Función para actualizar la barra de progreso global.
