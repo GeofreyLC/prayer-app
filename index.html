@@ -105,6 +105,20 @@
         padding: 8px 10px;
       }
     }
+    .mark-btn {
+        margin-left: 10px;
+        padding: 5px 10px;
+        border: none;
+        background: #28a745;
+        color: white;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: background 0.3s;
+        }
+
+    .mark-btn:hover {
+        background: #218838;
+        }
   </style>
 </head>
 <body>
@@ -181,21 +195,29 @@
         div.className = 'request-item';
         // Almacena el número de fila en un atributo para usarlo al actualizar
         div.dataset.row = item.row;
-        
-        // Si el status es "orando", se muestra en gris y no se le añade evento click
-        if(item.Status === "orando") {
-          div.style.color = 'grey';
-        }
-        
-        div.innerHTML = `<strong>${item.Country}</strong>: ${item['Prayer Requests']} <span>(${item.Status})</span>`;
-        
-        // Si el pedido está pendiente, lo hacemos clickeable para marcarlo como "orando"
+  
+        // Si el pedido está pendiente, mostramos un botón para marcarlo como "orando"
         if(item.Status === "pendiente") {
-          div.addEventListener('click', () => markAsOrando(item.row));
-        }
-        
-        content.appendChild(div);
-      });
+            div.innerHTML = `
+                <strong>${item.Country}</strong>: ${item['Prayer Requests']}
+                <button class="mark-btn">Orar</button>
+                <span>(${item.Status})</span>
+        `;
+        // El botón "Orar" disparará la función markAsOrando
+        div.querySelector('.mark-btn').addEventListener('click', (e) => {
+            e.stopPropagation(); // Evita que se dispare algún otro evento en el contenedor
+            markAsOrando(item.row);
+        });
+        } else {
+        // Si ya está marcado como orando, se muestra en gris y sin botón
+        div.innerHTML = `
+            <strong>${item.Country}</strong>: ${item['Prayer Requests']}
+            <span style="color: grey;">(${item.Status})</span>
+    `;
+  }
+  
+  content.appendChild(div);
+});
     }
     
     /**
