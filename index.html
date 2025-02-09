@@ -154,8 +154,8 @@
      * CONFIGURACIÓN: Reemplaza la siguiente variable con la URL
      * que obtuviste al desplegar tu Google Apps Script.
      ************************************************************/
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxAGOMd-eeSZ5UkVaiirfsKVAW-SKth-gHbPx8l5KXWNQAvUflsqty3K4sCCwZ3OOJoNw/exec'; // Ejemplo: https://script.google.com/macros/s/XXXXXXXX/exec
-    
+    const API_URL = 'https://script.google.com/macros/s/AKfycbykHWSHOiEq3jlmQqXSEqAJEu7B1kTaxBI4_tEVMGqoTnPLrajeTH464LumiUKeysW5Zg/exec'; // Ejemplo: https://script.google.com/macros/s/XXXXXXXX/exec
+   
     // Variable global para almacenar los datos obtenidos de la hoja
     let dataGlobal = [];
     
@@ -180,7 +180,7 @@
      */
     function displayRegion(region) {
       const content = document.getElementById('content');
-       content.innerHTML = '<p>Cargando datos...</p>'; // Indicador de carga
+       content.innerHTML = ''; // Indicador de carga
       /*content.innerHTML = ''; // Limpia el contenido anterior*/
       
       // Filtra los registros por la región seleccionada
