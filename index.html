@@ -182,7 +182,7 @@
      ************************************************************/
 
 
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxAGOMd-eeSZ5UkVaiirfsKVAW-SKth-gHbPx8l5KXWNQAvUflsqty3K4sCCwZ3OOJoNw/exec'; // Ejemplo: https://script.google.com/macros/s/XXXXXXXX/exec
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxzcQ29EIk5iOo6mEYNqYz-DCfiyyZ26_WMZVjxoNGqxK6jLFMn-XuB0UPBiJNK-T8wQw/exec'; // Ejemplo: https://script.google.com/macros/s/XXXXXXXX/exec
     
     // Variable global para almacenar los datos obtenidos de la hoja
     let dataGlobal = [];
@@ -198,7 +198,7 @@
         dataGlobal = data;
         updateProgressBar();
       } catch (error) {
-        console.error('Error getting data:', error);
+        console.error('Error al obtener datos:', error);
       }
     }
     
@@ -214,7 +214,7 @@
       const filtered = dataGlobal.filter(item => item.Region === region);
       
       if(filtered.length === 0) {
-        content.innerHTML = '<p>There is no data for this region.</p>';
+        content.innerHTML = '<p>No hay datos para esta región.</p>';
         return;
       }
       
@@ -224,20 +224,20 @@
         // Almacena el número de fila en un atributo para usarlo al actualizar
         div.dataset.row = item.row;
   
-        // Si el pedido está Pending, mostramos un botón para marcarlo como "Praying"
-        if(item.Status === "Pending") {
+        // Si el pedido está pending, mostramos un botón para marcarlo como "praying"
+        if(item.Status === "pending") {
             div.innerHTML = `
                 <strong>${item.Country}</strong>: ${item['Prayer Requests']}
-                <button class="mark-btn">Start Praying</button>
+                <button class="mark-btn">Orar</button>
                 <span>(${item.Status})</span>
         `;
-        // El botón "Start Praying" disparará la función markAsPraying
+        // El botón "Orar" disparará la función markAsOrando
         div.querySelector('.mark-btn').addEventListener('click', (e) => {
             e.stopPropagation(); // Evita que se dispare algún otro evento en el contenedor
-            markAsPraying(item.row);
+            markAsOrando(item.row);
         });
         } else {
-        // Si ya está marcado como Praying, se muestra en gris y sin botón
+        // Si ya está marcado como praying, se muestra en gris y sin botón
         div.innerHTML = `
         <span style="color: grey;"><strong>${item.Country}</strong>: ${item['Prayer Requests']}</span>
             <span style="color: grey;">(${item.Status})</span>
@@ -249,15 +249,15 @@
     }
     
     /**
-     * Función para marcar un pedido como "Praying".
+     * Función para marcar un pedido como "praying".
      * Envía una petición POST a la API con el número de fila a actualizar.
      */
-     async function markAsPraying(row) {
+     async function markAsOrando(row) {
   try {
     // Actualiza visualmente antes de esperar la respuesta
     dataGlobal = dataGlobal.map(item => {
       if (item.row == row) {
-        item.Status = "Praying";
+        item.Status = "praying";
       }
       return item;
     });
@@ -292,15 +292,15 @@
     
     /**
      * Función para actualizar la barra de progreso global.
-     * Calcula el porcentaje de pedidos marcados como "Praying".
+     * Calcula el porcentaje de pedidos marcados como "praying".
      */
     function updateProgressBar() {
       const total = dataGlobal.length;
-      const PrayingCount = dataGlobal.filter(item => item.Status === "Praying").length;
-      const progressPercent = total > 0 ? (PrayingCount / total) * 100 : 0;
+      const orandoCount = dataGlobal.filter(item => item.Status === "praying").length;
+      const progressPercent = total > 0 ? (orandoCount / total) * 100 : 0;
       
       document.getElementById('progress-bar').style.width = progressPercent + '%';
-      document.getElementById('progress-text').innerText = `${PrayingCount} of ${total} request in prayer`;
+      document.getElementById('progress-text').innerText = `${orandoCount} de ${total} praying`;
     }
     
     // Agregar eventos a los botones de regiones
@@ -320,4 +320,3 @@
   </script>
 </body>
 </html>
-
