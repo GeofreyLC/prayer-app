@@ -224,24 +224,29 @@
         // Almacena el número de fila en un atributo para usarlo al actualizar
         div.dataset.row = item.row;
   
-        // Si el pedido está pendiente, mostramos un botón para marcarlo como "orando"
+        // Si el pedido está pendiente, mostramos un botón para marcarlo como "praying"
         if(item.Status === "pendiente") {
             div.innerHTML = `
                 <strong>${item.Country}</strong>: ${item['Prayer Requests']}
-                <button class="mark-btn">Orar</button>
-                <span>(${item.Status})</span>
+                <button class="mark-btn">Start Prayer</button>
+                <span>(pending)</span>
         `;
+          //iria debajo de button... <span>(${item.Status})</span>
+
         // El botón "Orar" disparará la función markAsOrando
         div.querySelector('.mark-btn').addEventListener('click', (e) => {
             e.stopPropagation(); // Evita que se dispare algún otro evento en el contenedor
             markAsOrando(item.row);
         });
         } else {
-        // Si ya está marcado como orando, se muestra en gris y sin botón
+        // Si ya está marcado como praying, se muestra en gris y sin botón
         div.innerHTML = `
         <span style="color: grey;"><strong>${item.Country}</strong>: ${item['Prayer Requests']}</span>
-            <span style="color: grey;">(${item.Status})</span>
-    `;
+        <span style="color: grey;">(praying)</span>
+    `
+    //esto iria debajo del otro... <span style="color: grey;">(${item.Status})</span>
+    ;
+
   }
   
   content.appendChild(div);
@@ -249,7 +254,7 @@
     }
     
     /**
-     * Función para marcar un pedido como "orando".
+     * Función para marcar un pedido como "praying".
      * Envía una petición POST a la API con el número de fila a actualizar.
      */
      async function markAsOrando(row) {
@@ -272,11 +277,15 @@
     // Ahora se envía la petición al servidor sin bloquear la UI
     const response = await fetch(API_URL, {
       method: 'POST',
-      body: JSON.stringify({ row: row }),
+      body: JSON.stringify({ row: row, status: "orando" }), // Se envía el estado correcto
       headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
+        'Content-Type': 'application/json'
       }
     });
+
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
 
     const result = await response.json();
     console.log("Respuesta de la API:", result);
@@ -287,12 +296,14 @@
 
   } catch (error) {
     console.error('Error al actualizar:', error);
+    alert('Hubo un problema al actualizar el estado. Inténtalo de nuevo.');
   }
 }
+
     
     /**
      * Función para actualizar la barra de progreso global.
-     * Calcula el porcentaje de pedidos marcados como "orando".
+     * Calcula el porcentaje de pedidos marcados como "praying".
      */
     function updateProgressBar() {
       const total = dataGlobal.length;
@@ -300,7 +311,7 @@
       const progressPercent = total > 0 ? (orandoCount / total) * 100 : 0;
       
       document.getElementById('progress-bar').style.width = progressPercent + '%';
-      document.getElementById('progress-text').innerText = `${orandoCount} de ${total} orando`;
+      document.getElementById('progress-text').innerText = `${orandoCount} of ${total} covered`;
     }
     
     // Agregar eventos a los botones de regiones
@@ -320,4 +331,6 @@
   </script>
 </body>
 </html>
+
+
 
