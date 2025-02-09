@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,24 +12,33 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f8f9fa;
+      /*background: #f8f9fa;*/
+      padding: 0;
+      background-color: #0f172a; /* Azul oscuro */
+      overflow: hidden;
     }
     /* Fondo de la pantalla de inicio */
-    #background {
-      background-image: url('https://i.imgur.com/6Iej2c3.jpg'); /* URL de un mapa del mundo (puedes reemplazarla) */
+     .animated-map {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      background: url("https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg") no-repeat center;
       background-size: cover;
-      background-position: center;
-      text-align: center;
-      padding: 100px 0;
-      color: white;
-      position: relative;
+      opacity: 0.3;
     }
-    #background h1 {
-      font-size: 2em;
-      background: rgba(0,0,0,0.5);
-      display: inline-block;
-      padding: 10px 20px;
-      border-radius: 5px;
+
+    .dot {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      border-radius: 50%;
+      animation: blink 1.5s infinite alternate;
+    }
+
+    @keyframes blink {
+      0% { opacity: 0.3; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.5); }
     }
     /* Estilos para la navegación de regiones */
     #regions {
@@ -138,7 +147,7 @@
 </head>
 <body>
   <!-- Pantalla de inicio con fondo y título -->
-  <div id="background">
+  <div class="animated-map" id="mapa"></div>
     <h1>Who else can pray for the nations?</h1>
   </div>
   
@@ -165,6 +174,31 @@
   </div>
   
   <script>
+
+// Coordenadas simuladas (en porcentaje de la pantalla)
+    const locations = [
+      { top: "30%", left: "40%" }, // América del Norte
+      { top: "50%", left: "60%" }, // Europa
+      { top: "70%", left: "20%" }, // América del Sur
+      { top: "40%", left: "80%" }, // Asia
+      { top: "60%", left: "50%" }  // África
+    ];
+
+    function generarPuntos() {
+      const mapa = document.getElementById("mapa");
+
+      locations.forEach(loc => {
+        let dot = document.createElement("div");
+        dot.classList.add("dot");
+        dot.style.top = loc.top;
+        dot.style.left = loc.left;
+        mapa.appendChild(dot);
+      });
+    }
+
+    generarPuntos();
+
+    
     /************************************************************
      * CONFIGURACIÓN: Reemplaza la siguiente variable con la URL
      * que obtuviste al desplegar tu Google Apps Script.
