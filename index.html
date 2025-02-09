@@ -224,8 +224,8 @@
         // Almacena el número de fila en un atributo para usarlo al actualizar
         div.dataset.row = item.row;
   
-        // Si el pedido está pending, mostramos un botón para marcarlo como "praying"
-        if(item.Status === "pending") {
+        // Si el pedido está pendiente, mostramos un botón para marcarlo como "orando"
+        if(item.Status === "pendiente") {
             div.innerHTML = `
                 <strong>${item.Country}</strong>: ${item['Prayer Requests']}
                 <button class="mark-btn">Orar</button>
@@ -237,7 +237,7 @@
             markAsOrando(item.row);
         });
         } else {
-        // Si ya está marcado como praying, se muestra en gris y sin botón
+        // Si ya está marcado como orando, se muestra en gris y sin botón
         div.innerHTML = `
         <span style="color: grey;"><strong>${item.Country}</strong>: ${item['Prayer Requests']}</span>
             <span style="color: grey;">(${item.Status})</span>
@@ -249,7 +249,7 @@
     }
     
     /**
-     * Función para marcar un pedido como "praying".
+     * Función para marcar un pedido como "orando".
      * Envía una petición POST a la API con el número de fila a actualizar.
      */
      async function markAsOrando(row) {
@@ -257,7 +257,7 @@
     // Actualiza visualmente antes de esperar la respuesta
     dataGlobal = dataGlobal.map(item => {
       if (item.row == row) {
-        item.Status = "praying";
+        item.Status = "orando";
       }
       return item;
     });
@@ -292,15 +292,15 @@
     
     /**
      * Función para actualizar la barra de progreso global.
-     * Calcula el porcentaje de pedidos marcados como "praying".
+     * Calcula el porcentaje de pedidos marcados como "orando".
      */
     function updateProgressBar() {
       const total = dataGlobal.length;
-      const orandoCount = dataGlobal.filter(item => item.Status === "praying").length;
+      const orandoCount = dataGlobal.filter(item => item.Status === "orando").length;
       const progressPercent = total > 0 ? (orandoCount / total) * 100 : 0;
       
       document.getElementById('progress-bar').style.width = progressPercent + '%';
-      document.getElementById('progress-text').innerText = `${orandoCount} de ${total} praying`;
+      document.getElementById('progress-text').innerText = `${orandoCount} de ${total} orando`;
     }
     
     // Agregar eventos a los botones de regiones
@@ -320,3 +320,4 @@
   </script>
 </body>
 </html>
+
