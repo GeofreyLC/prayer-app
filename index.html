@@ -277,15 +277,11 @@
     // Ahora se envía la petición al servidor sin bloquear la UI
     const response = await fetch(API_URL, {
       method: 'POST',
-      body: JSON.stringify({ row: row, status: "orando" }), // Se envía el estado correcto
+      body: JSON.stringify({ row: row }),
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'text/plain;charset=utf-8'
       }
     });
-
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
-    }
 
     const result = await response.json();
     console.log("Respuesta de la API:", result);
@@ -296,7 +292,6 @@
 
   } catch (error) {
     console.error('Error al actualizar:', error);
-    alert('Hubo un problema al actualizar el estado. Inténtalo de nuevo.');
   }
 }
 
@@ -331,6 +326,3 @@
   </script>
 </body>
 </html>
-
-
-
