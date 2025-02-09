@@ -12,33 +12,24 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      /*background: #f8f9fa;*/
-      padding: 0;
-      background-color: #0f172a; /* Azul oscuro */
-      overflow: hidden;
+      background: #f8f9fa;
     }
     /* Fondo de la pantalla de inicio */
-     .animated-map {
-      position: absolute;
-      width: 100vw;
-      height: 100vh;
-      background: url("https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg") no-repeat center;
+    #background {
+      background-image: url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg'); /* URL de un mapa del mundo (puedes reemplazarla) */
       background-size: cover;
-      opacity: 0.3;
+      background-position: center;
+      text-align: center;
+      padding: 100px 0;
+      color: white;
+      position: relative;
     }
-
-    .dot {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background-color: red;
-      border-radius: 50%;
-      animation: blink 1.5s infinite alternate;
-    }
-
-    @keyframes blink {
-      0% { opacity: 0.3; transform: scale(1); }
-      100% { opacity: 1; transform: scale(1.5); }
+    #background h1 {
+      font-size: 2em;
+      background: rgba(0,0,0,0.5);
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 5px;
     }
     /* Estilos para la navegación de regiones */
     #regions {
@@ -49,19 +40,20 @@
     }
     #regions button {
       margin: 5px;
-      padding: 10px 15px;
+      padding: 15px 20px;
+      font-size: 18px;
       border: none;
-      background: #007BFF;
+      background: #215994;
       color: white;
       cursor: pointer;
       border-radius: 5px;
       transition: background 0.3s;
     }
     #regions button:hover {
-      background: #0056b3;
+      background: #08396d;
     }
     #regions button.active {
-      background: #0056b3;
+      background: #4a5b6d;
     }
     /* Área de contenido donde se muestran los pedidos */
     #content {
@@ -71,6 +63,7 @@
     }
     .request-item {
       background: #ffffff;
+      color: #333;
       margin: 10px 0;
       padding: 10px;
       border-radius: 5px;
@@ -81,6 +74,25 @@
     .request-item:hover {
       background: #f1f1f1;
     }
+
+    .scrollable-container {
+        max-height: 350px; /* Ajusta el valor según el tamaño deseado */
+        overflow-y: auto; /* Esto permite el desplazamiento */
+        margin-top: 20px; /* Esto añade un pequeño espacio entre el contenido y los pedidos de oración */
+        }    
+        
+    .header-or-map {
+        position: fixed;
+        top: 0; /* Esto lo mantiene en la parte superior */
+        left: 0; /* Esto lo alinea a la izquierda */
+        width: 100%; /* Esto hace que ocupe todo el ancho */
+        z-index: 9999; /* Asegura que quede por encima de otros elementos */
+        }
+
+    .content-container {
+        margin-top: 80px; /* Ajusta el valor según el tamaño de tu cabecera/mapa */
+        }
+
     /* Barra de progreso global */
     #progress-container {
       width: 80%;
@@ -102,7 +114,7 @@
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      color: white;
+      color: rgb(27, 27, 27);
       font-weight: bold;
       line-height: 25px;
     }
@@ -128,83 +140,50 @@
     .mark-btn:hover {
         background: #218838;
         }
-    #loading-bar {
-      width: 100%;
-      height: 5px;
-      background-color: #ddd;
-      position: relative;
-      overflow: hidden;
-    }
-
-    #loading-bar div {
-      width: 0%;
-      height: 100%;
-      background-color: #007bff;
-      transition: width 1s;
-    }
 
   </style>
 </head>
 <body>
   <!-- Pantalla de inicio con fondo y título -->
-  <div class="animated-map" id="mapa"></div>
+  <div class="header-or-map" id="background">
     <h1>Who else can pray for the nations?</h1>
+
+<!-- Navegación por regiones -->
+    <nav id="regions">
+        <button data-region="Africa">Africa</button>
+        <button data-region="East Asia">East Asia</button>
+        <button data-region="Europe">Europe</button>
+        <button data-region="NAO">NAO</button>
+        <button data-region="Namestan">Namestan</button>
+        <button data-region="SESA">SESA</button>
+        <button data-region="LAC">LAC</button>
+    </nav>
+
+<!-- Barra de progreso global -->
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+        <span id="progress-text"></span>
+    </div>
+
   </div>
   
-  <!-- Navegación por regiones -->
-  <nav id="regions">
-    <button data-region="Africa">Africa</button>
-    <button data-region="East Asia">East Asia</button>
-    <button data-region="Europe">Europe</button>
-    <button data-region="NAO">NAO</button>
-    <button data-region="Namestan">Namestan</button>
-    <button data-region="SESA">SESA</button>
-    <button data-region="LAC">LAC</button>
-  </nav>
-  
-  <!-- Área donde se mostrarán los pedidos de oración -->
-  <section id="content">
-    <!-- Se llenará dinámicamente con JavaScript -->
-  </section>
-  
-  <!-- Barra de progreso global -->
-  <div id="progress-container">
-    <div id="progress-bar"></div>
-    <span id="progress-text"></span>
-  </div>
-  
-  <script>
 
-// Coordenadas simuladas (en porcentaje de la pantalla)
-    const locations = [
-      { top: "30%", left: "40%" }, // América del Norte
-      { top: "50%", left: "60%" }, // Europa
-      { top: "70%", left: "20%" }, // América del Sur
-      { top: "40%", left: "80%" }, // Asia
-      { top: "60%", left: "50%" }  // África
-    ];
-
-    function generarPuntos() {
-      const mapa = document.getElementById("mapa");
-
-      locations.forEach(loc => {
-        let dot = document.createElement("div");
-        dot.classList.add("dot");
-        dot.style.top = loc.top;
-        dot.style.left = loc.left;
-        mapa.appendChild(dot);
-      });
-    }
-
-    generarPuntos();
-
+<div id="content" class="content-container scrollable-container">
+    <!--<div class="scrollable-container">-->
+    <!-- Área donde se mostrarán los pedidos de oración -->
     
+    <!--</div>-->
+</div>
+
+  <script>
     /************************************************************
      * CONFIGURACIÓN: Reemplaza la siguiente variable con la URL
      * que obtuviste al desplegar tu Google Apps Script.
      ************************************************************/
+
+
     const API_URL = 'https://script.google.com/macros/s/AKfycbxAGOMd-eeSZ5UkVaiirfsKVAW-SKth-gHbPx8l5KXWNQAvUflsqty3K4sCCwZ3OOJoNw/exec'; // Ejemplo: https://script.google.com/macros/s/XXXXXXXX/exec
-   
+    
     // Variable global para almacenar los datos obtenidos de la hoja
     let dataGlobal = [];
     
@@ -213,25 +192,15 @@
      * Se usa fetch para hacer una petición GET y obtener la información en JSON.
      */
     async function fetchData() {
-  // Muestra el indicador de carga en el contenedor "content"
-  document.getElementById('content').innerHTML = "<p>Cargando información...</p>";
-
-  try {
-    const response = await fetch(API_URL);
-    const data = await response.json();
-    dataGlobal = data;
-
-    // Limpia el mensaje de carga una vez que se obtienen los datos
-    document.getElementById('content').innerHTML = "";
-    
-    // Actualiza la barra de progreso y cualquier otro elemento que dependa de los datos
-    updateProgressBar();
-  } catch (error) {
-    console.error('Error al obtener datos:', error);
-    document.getElementById('content').innerHTML = "<p>Error al cargar los datos.</p>";
-  }
-}
-
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        dataGlobal = data;
+        updateProgressBar();
+      } catch (error) {
+        console.error('Error getting data:', error);
+      }
+    }
     
     /**
      * Función para mostrar en pantalla los pedidos de una región seleccionada.
@@ -239,14 +208,13 @@
      */
     function displayRegion(region) {
       const content = document.getElementById('content');
-       content.innerHTML = ''; // Indicador de carga
-      /*content.innerHTML = ''; // Limpia el contenido anterior*/
+      content.innerHTML = ''; // Limpia el contenido anterior
       
       // Filtra los registros por la región seleccionada
       const filtered = dataGlobal.filter(item => item.Region === region);
       
       if(filtered.length === 0) {
-        content.innerHTML = '<p>No hay datos para esta región.</p>';
+        content.innerHTML = '<p>There is no data for this region.</p>';
         return;
       }
       
@@ -256,22 +224,22 @@
         // Almacena el número de fila en un atributo para usarlo al actualizar
         div.dataset.row = item.row;
   
-        // Si el pedido está pendiente, mostramos un botón para marcarlo como "orando"
-        if(item.Status === "pendiente") {
+        // Si el pedido está Pending, mostramos un botón para marcarlo como "Praying"
+        if(item.Status === "Pending") {
             div.innerHTML = `
                 <strong>${item.Country}</strong>: ${item['Prayer Requests']}
-                <button class="mark-btn">Orar</button>
+                <button class="mark-btn">Start Praying</button>
                 <span>(${item.Status})</span>
         `;
-        // El botón "Orar" disparará la función markAsOrando
+        // El botón "Start Praying" disparará la función markAsPraying
         div.querySelector('.mark-btn').addEventListener('click', (e) => {
             e.stopPropagation(); // Evita que se dispare algún otro evento en el contenedor
-            markAsOrando(item.row);
+            markAsPraying(item.row);
         });
         } else {
-        // Si ya está marcado como orando, se muestra en gris y sin botón
+        // Si ya está marcado como Praying, se muestra en gris y sin botón
         div.innerHTML = `
-            <strong>${item.Country}</strong>: ${item['Prayer Requests']}
+        <span style="color: grey;"><strong>${item.Country}</strong>: ${item['Prayer Requests']}</span>
             <span style="color: grey;">(${item.Status})</span>
     `;
   }
@@ -281,16 +249,15 @@
     }
     
     /**
-     * Función para marcar un pedido como "orando".
+     * Función para marcar un pedido como "Praying".
      * Envía una petición POST a la API con el número de fila a actualizar.
      */
-
-  async function markAsOrando(row) {
+     async function markAsPraying(row) {
   try {
     // Actualiza visualmente antes de esperar la respuesta
     dataGlobal = dataGlobal.map(item => {
       if (item.row == row) {
-        item.Status = "orando";
+        item.Status = "Praying";
       }
       return item;
     });
@@ -322,91 +289,35 @@
     console.error('Error al actualizar:', error);
   }
 }
-
     
-/*ORIGINAL async function markAsOrando(row) {
-  try {
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ row: row }),
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      }
-    });
-    const result = await response.json();
-    console.log("Respuesta de la API:", result);
-    
-    if (result.result === "success") {
-      // Actualiza localmente el estado del pedido
-      dataGlobal = dataGlobal.map(item => {
-        if (item.row == row) {
-          item.Status = "orando";
-        }
-        return item;
-      });
-      // Actualiza la vista de la región actualmente activa
-      const activeRegionButton = document.querySelector('#regions button.active');
-      if (activeRegionButton) {
-        displayRegion(activeRegionButton.dataset.region);
-      }
-      updateProgressBar();
-    } else {
-      alert(result.message);
-    }
-  } catch (error) {
-    console.error('Error al actualizar:', error);
-  }
-} ORIGINAL*/
-
-
     /**
      * Función para actualizar la barra de progreso global.
-     * Calcula el porcentaje de pedidos marcados como "orando".
+     * Calcula el porcentaje de pedidos marcados como "Praying".
      */
-    // Función que actualiza la barra de progreso con los datos reales
-function updateProgressBar() {
-  const total = dataGlobal.length;
-  const orandoCount = dataGlobal.filter(item => item.Status === "orando").length;
-  const progressPercent = total > 0 ? (orandoCount / total) * 100 : 0;
-  
-  document.getElementById('progress-bar').style.width = progressPercent + '%';
-  document.getElementById('progress-text').innerText = `${orandoCount} de ${total} orando`;
-}
-
-// Función que simula una animación de carga en la barra de progreso
-function actualizarBarraProgreso() {
-  let progressBar = document.getElementById("progress-bar");
-  // Configura una transición lenta para simular la carga
-  progressBar.style.transition = "width 2s";
-  // Simula que la barra se llena al 100%
-  progressBar.style.width = "100%";
-  
-  // Después de 2 segundos, restablece la transición a rápida y actualiza con el valor real
-  setTimeout(() => { 
-    progressBar.style.transition = "width 0.5s";
-    updateProgressBar();
-  }, 2000);
-}
-
-// Agregar eventos a los botones de regiones
-document.querySelectorAll('#regions button').forEach(button => {
-  button.addEventListener('click', () => {
-    // Remueve la clase "active" de todos los botones y la asigna al seleccionado
-    document.querySelectorAll('#regions button').forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
+    function updateProgressBar() {
+      const total = dataGlobal.length;
+      const PrayingCount = dataGlobal.filter(item => item.Status === "Praying").length;
+      const progressPercent = total > 0 ? (PrayingCount / total) * 100 : 0;
+      
+      document.getElementById('progress-bar').style.width = progressPercent + '%';
+      document.getElementById('progress-text').innerText = `${PrayingCount} of ${total} request in prayer`;
+    }
     
-    // Llama a la función de simulación de la barra de carga
-    actualizarBarraProgreso();
-    
-    // Muestra los datos de la región seleccionada
-    displayRegion(button.dataset.region);
-  });
-});
-
+    // Agregar eventos a los botones de regiones
+    document.querySelectorAll('#regions button').forEach(button => {
+      button.addEventListener('click', () => {
+        // Remueve la clase "active" de todos los botones y la asigna al seleccionado
+        document.querySelectorAll('#regions button').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        displayRegion(button.dataset.region);
+      });
+    });
     
     // Se obtiene la información al cargar la página y se refresca cada 10 segundos
     fetchData();
     setInterval(fetchData, 10000);
+
   </script>
 </body>
 </html>
+
