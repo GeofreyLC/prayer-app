@@ -1,46 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Who else can pray for the nations?</title>
+  <script type="module">
+    // Importar Firebase y Firestore
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDkLid9IYVjE8fQkznAZ5KQB0rAg127xqA",
+      authDomain: "prayer-request-app-8b013.firebaseapp.com",
+      projectId: "prayer-request-app-8b013",
+      storageBucket: "prayer-request-app-8b013.firebasestorage.app",
+      messagingSenderId: "788615186867",
+      appId: "1:788615186867:web:ae7475239f111bb60063c6",
+      measurementId: "G-M670R2NM75"
+    };
+
+    // Inicializar Firebase y Firestore
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let dataGlobal = [];
+    let currentPrayerId = null; // Para almacenar temporalmente el id del pedido que se va a marcar
+
+    // Obtener datos en tiempo real desde Firestore
+    function fetchData() {
+      onSnapshot(collection(db, "tus-datos"), (snapshot) => {
+        dataGlobal = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        updateProgressBar();
+        const activeRegionButton = document.querySelector("#regions button.active");
+        if (activeRegionButton) {
+          displayRegion(activeRegionButton.dataset.region);
+        }
+      });
+    }
+
+    // Mostrar pedidos de oración por región (ordenados alfabéticamente por país)
+    function displayRegion(region) {
+      const content = document.getElementById("content");
+      // Al seleccionar una región se elimina la sección de instrucciones
+      content.innerHTML = "";
+
+      let filtered = dataGlobal.filter(item => item.Region === region);
+      // Ordenar alfabéticamente por el nombre del país
+      filtered.sort((a, b) => a.Country.localeCompare(b.Country));
+
+      if (filtered.length === 0) {
+        content.innerHTML = "<p>No hay datos para esta región.</p>";
+        return;
+      }
+
+      filtered.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "request-item";
+        div.dataset.id = item.id;
+
+        if (item.Status === "pendiente") {
+          div.innerHTML = `
+            <strong>${item.Country}</strong>: ${item["Prayer Requests"]}
+            <button class="mark-btn">Start Praying</button>
+            <span>(pending)</span>
+          `;
+          // Se muestra el modal de confirmación personalizado
+          div.querySelector(".mark-btn").addEventListener("click", (e) => {
+            e.stopPropagation();
+            currentPrayerId = item.id;
+            showConfirmationModal();
+          });
+        } else {
+          div.innerHTML = `
+            <span style="color: grey;"><strong>${item.Country}</strong>: ${item["Prayer Requests"]}</span>
+            <span style="color: grey;">(praying)</span>
+          `;
+        }
+
+        content.appendChild(div);
+      });
+    }
+
+    // Función para mostrar el modal de confirmación
+    function showConfirmationModal() {
+      const modal = document.getElementById("confirmation-modal");
+      modal.style.display = "flex";
+    }
+
+    // Función para ocultar el modal
+    function hideConfirmationModal() {
+      const modal = document.getElementById("confirmation-modal");
+      modal.style.display = "none";
+    }
+
+    // Marcar pedido como "orando" en Firestore
+    async function markAsOrando(id) {
+      try {
+        const prayerRef = doc(db, "tus-datos", id);
+        await updateDoc(prayerRef, { Status: "orando" });
+        // Actualizar la UI instantáneamente
+        dataGlobal = dataGlobal.map(item => (item.id === id ? { ...item, Status: "orando" } : item));
+        const activeRegionButton = document.querySelector("#regions button.active");
+        if (activeRegionButton) {
+          displayRegion(activeRegionButton.dataset.region);
+        }
+        updateProgressBar();
+      } catch (error) {
+        console.error("Error al actualizar:", error);
+      }
+    }
+
+    // Actualizar la barra de progreso
+    function updateProgressBar() {
+      const total = dataGlobal.length;
+      const orandoCount = dataGlobal.filter(item => item.Status === "orando").length;
+      const progressPercent = total > 0 ? (orandoCount / total) * 100 : 0;
+      document.getElementById("progress-bar").style.width = progressPercent + "%";
+      document.getElementById("progress-text").innerText = `${orandoCount} of ${total} covered`;
+    }
+
+    // Configurar eventos en los botones de regiones y el modal de confirmación
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll("#regions button").forEach(button => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll("#regions button").forEach(btn => btn.classList.remove("active"));
+          button.classList.add("active");
+          displayRegion(button.dataset.region);
+        });
+      });
+
+      // Eventos para el modal de confirmación
+      document.getElementById("modal-yes").addEventListener("click", () => {
+        if (currentPrayerId) {
+          markAsOrando(currentPrayerId);
+        }
+        hideConfirmationModal();
+      });
+      document.getElementById("modal-no").addEventListener("click", () => {
+        hideConfirmationModal();
+      });
+
+      fetchData();
+    });
+  </script>
   <style>
-    /* ===============================
-       Estilos CSS para un diseño minimalista,
-       responsivo y juvenil
-       =============================== */
+    /* Evitar scroll global: Solo main tendrá scroll */
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
       background: #f8f9fa;
+      padding-bottom: 60px;  /*Espacio para el footer fijo */
+      margin: 0; /* AJUSTE!!! */
     }
-    /* Fondo de la pantalla de inicio */
-    #background {
-      background-image: url('https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg'); /* URL de un mapa del mundo (puedes reemplazarla) */
-      background-size: cover;
-      background-position: center;
-      text-align: center;
-      padding: 100px 0;
-      color: white;
+    /* ===== HEADER FIJO CON MAPA ANIMADO ===== */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 240px; /* Altura del área del mapa */
+      overflow: hidden;
+      z-index: 1000;
+    }
+    /* Contenedor del mapa animado */
+    #map-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 200%; /* Para la animación horizontal */
+      height: 100%;
+    }
+    #map-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      animation: panLeft 60s linear infinite;
+    }
+    @keyframes panLeft {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    /* Overlay para los controles (título, botones y barra) */
+    .overlay {
       position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: rgba(0,0,0,0.3);
+      padding: 10px;
     }
-    #background h1 {
+    .overlay h1 {
       font-size: 2em;
       background: rgba(0,0,0,0.5);
-      display: inline-block;
-      padding: 10px 20px;
+      padding: 8px 12px;
+      text-align: center;
       border-radius: 5px;
+      margin-bottom: 10px;
+      color: white;
     }
-    /* Estilos para la navegación de regiones */
     #regions {
       display: flex;
-      justify-content: center;
       flex-wrap: wrap;
-      margin: 20px;
+      justify-content: center;
+      margin: 5px 0;
     }
+    /* Botones más grandes */
     #regions button {
       margin: 5px;
-      padding: 15px 20px;
+      padding: 12px 20px;
       font-size: 18px;
       border: none;
       background: #215994;
@@ -55,12 +233,142 @@
     #regions button.active {
       background: #4a5b6d;
     }
-    /* Área de contenido donde se muestran los pedidos */
-    #content {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 10px;
+    /* Barra de progreso */
+    #progress-container {
+      width: 90%;
+      max-width: 400px;
+      background: #e0e0e0;
+      border-radius: 5px;
+      overflow: hidden;
+      position: relative;
+      height: 20px;
+      margin-top: 10px;
     }
+    #progress-bar {
+      height: 100%;
+      background: #28a745;
+      width: 0%;
+      transition: width 0.5s;
+    }
+    #progress-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgb(27,27,27);
+      font-weight: bold;
+      font-size: 12px;
+    }
+    /* ===== MAIN: Área Desplazable del Contenido ===== */
+    main {
+      position: absolute;
+      top: 240px;    /* 20px extra de separación debajo del header (240px + 10px) */
+      bottom: 50px;  /* 60px del footer fijo */ /* AJUSTEE!!! */ 
+      left: 0;
+      right: 0;
+      overflow-y: auto;
+      padding: 10px;  /* Padding interno pequeño */
+      background: #f8f9fa;
+      box-sizing: border-box; /* Para no incluir el padding en el cálculo de tamaño *//* AJUSTEE!!! */ 
+    }
+    /* Contenedor interno que envuelve las instrucciones y los pedidos */
+    #content {
+      margin-top: 250px;
+      margin-left: auto;
+      margin-right: auto;
+
+      background: #fff;
+      border-radius: 8px;
+      padding: 5px;
+      margin: 5px auto; /* Margen vertical reducido */
+      max-width: 800px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    /* Estilos para la sección de instrucciones */
+    #instructions-container {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 15px;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+    #instructions-container img {
+      display: block;
+      margin: 0 auto 10px auto;
+      max-width: 100px;
+    }
+    #instructions-container h2 {
+      margin-bottom: 10px;
+      font-size: 1.5em;
+      color: #333;
+    }
+    #instructions-container ul {
+      list-style: none;
+      padding: 0;
+      font-size: 16px;
+      color: #555;
+      text-align: left;
+      display: inline-block;
+    }
+    #instructions-container ul li {
+      margin-bottom: 5px;
+    }
+    /* ===== Modal de Confirmación Personalizado ===== */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1100;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      max-width: 400px;
+      width: 80%;
+    }
+    .modal-buttons {
+      margin-top: 20px;
+    }
+    .modal-buttons button {
+      margin: 0 10px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #modal-yes {
+      background: #28a745;
+      color: #fff;
+    }
+    #modal-no {
+      background: #ccc;
+      color: #333;
+    }
+    /* ===== PIE DE PÁGINA (FOOTER) FIJO ===== */
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #333;
+      color: #fff;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 14px;
+      z-index: 1001;
+    }
+    /* ===== ESTILOS PARA LAS PETICIONES DE ORACIÓN ===== */
     .request-item {
       background: #ffffff;
       color: #333;
@@ -74,82 +382,58 @@
     .request-item:hover {
       background: #f1f1f1;
     }
-
-    .scrollable-container {
-        max-height: 350px; /* Ajusta el valor según el tamaño deseado */
-        overflow-y: auto; /* Esto permite el desplazamiento */
-        margin-top: 20px; /* Esto añade un pequeño espacio entre el contenido y los pedidos de oración */
-        }    
-        
-    .header-or-map {
-        position: fixed;
-        top: 0; /* Esto lo mantiene en la parte superior */
-        left: 0; /* Esto lo alinea a la izquierda */
-        width: 100%; /* Esto hace que ocupe todo el ancho */
-        z-index: 9999; /* Asegura que quede por encima de otros elementos */
-        }
-
-    .content-container {
-        margin-top: 80px; /* Ajusta el valor según el tamaño de tu cabecera/mapa */
-        }
-
-    /* Barra de progreso global */
-    #progress-container {
-      width: 80%;
-      margin: 20px auto;
-      background: #e0e0e0;
-      border-radius: 5px;
-      overflow: hidden;
-      position: relative;
-      height: 25px;
-    }
-    #progress-bar {
-      height: 100%;
+    .mark-btn {
+      margin-left: 10px;
+      padding: 5px 10px;
+      border: none;
       background: #28a745;
-      width: 0%;
-      transition: width 0.5s;
+      color: white;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.3s;
     }
-    #progress-text {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      color: rgb(27, 27, 27);
-      font-weight: bold;
-      line-height: 25px;
+    .mark-btn:hover {
+      background: #218838;
     }
+    /* ===== Media Queries ===== */
     @media (max-width: 600px) {
-      #background {
-        padding: 50px 0;
+      header {
+        height: 240px;
+      }
+      main {
+        top: 240px;
+        bottom: 60px;
+        height: calc(100vh - 240px - 60px);
+        padding: 10px;
+      }
+      .overlay h1 {
+        font-size: 1.6em;
       }
       #regions button {
-        padding: 8px 10px;
+        margin: 4px;
+        padding: 10px 16px;
+        font-size: 16px;
+      }
+      #progress-container {
+        height: 20px;
+      }
+      #progress-text {
+        font-size: 12px;
+      }
+      #content {
+        margin: 10px auto;
       }
     }
-    .mark-btn {
-        margin-left: 10px;
-        padding: 5px 10px;
-        border: none;
-        background: #28a745;
-        color: white;
-        border-radius: 3px;
-        cursor: pointer;
-        transition: background 0.3s;
-        }
-
-    .mark-btn:hover {
-        background: #218838;
-        }
-
   </style>
 </head>
 <body>
-  <!-- Pantalla de inicio con fondo y título -->
-  <div class="header-or-map" id="background">
-    <h1>Who else can pray for the nations?</h1>
-
-<!-- Navegación por regiones -->
-    <nav id="regions">
+  <header>
+    <div id="map-container">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg" alt="Map Background">
+    </div>
+    <div class="overlay">
+      <h1>Who else can pray for the nations?</h1>
+      <nav id="regions">
         <button data-region="Africa">Africa</button>
         <button data-region="East Asia">East Asia</button>
         <button data-region="Europe">Europe</button>
@@ -157,172 +441,41 @@
         <button data-region="Namestan">Namestan</button>
         <button data-region="SESA">SESA</button>
         <button data-region="LAC">LAC</button>
-    </nav>
-
-<!-- Barra de progreso global -->
-    <div id="progress-container">
+      </nav>
+      <div id="progress-container">
         <div id="progress-bar"></div>
         <span id="progress-text"></span>
+      </div>
     </div>
-
+  </header>
+  <main>
+    <div id="content" class="content-container scrollable-container">
+      <!-- Sección de instrucciones inicial -->
+      <div id="instructions-container">
+        <img src="https://raw.githubusercontent.com/GeofreyLC/prayer-app/refs/heads/main/Who%20Else%20-%20Logo.png" alt="Logo">
+        <h2>Instructions:</h2>
+        <ul>
+          <li>- Select a region to access the list of countries you can start praying for.</li>
+          <li>- Don't forget to mark the country/countries you have started praying for with the "Start Praying" button.</li>
+        </ul>
+      </div>
+      <!-- Aquí se mostrarán los pedidos de oración tras seleccionar una región -->
+    </div>
+  </main>
+  <!-- Modal de Confirmación Personalizado -->
+  <div id="confirmation-modal" class="modal">
+    <div class="modal-content">
+      <p>Do you commit to pray for this country? If you select "Yes", you will not be able to undo this.</p>
+      <div class="modal-buttons">
+        <button id="modal-yes">Yes</button>
+        <button id="modal-no">No</button>
+      </div>
+    </div>
   </div>
-  
-
-<div id="content" class="content-container scrollable-container">
-    <!--<div class="scrollable-container">-->
-    <!-- Área donde se mostrarán los pedidos de oración -->
-    
-    <!--</div>-->
-</div>
-
-  <script>
-    /************************************************************
-     * CONFIGURACIÓN: Reemplaza la siguiente variable con la URL
-     * que obtuviste al desplegar tu Google Apps Script.
-     ************************************************************/
-
-
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxAGOMd-eeSZ5UkVaiirfsKVAW-SKth-gHbPx8l5KXWNQAvUflsqty3K4sCCwZ3OOJoNw/exec'; // Ejemplo: https://script.google.com/macros/s/XXXXXXXX/exec
-    
-    // Variable global para almacenar los datos obtenidos de la hoja
-    let dataGlobal = [];
-    
-    /**
-     * Función para obtener los datos de la hoja a través de la API.
-     * Se usa fetch para hacer una petición GET y obtener la información en JSON.
-     */
-    async function fetchData() {
-      try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        dataGlobal = data;
-        updateProgressBar();
-      } catch (error) {
-        console.error('Error al obtener datos:', error);
-      }
-    }
-    
-    /**
-     * Función para mostrar en pantalla los pedidos de una región seleccionada.
-     * Filtra los datos globales y crea elementos HTML para cada pedido.
-     */
-    function displayRegion(region) {
-      const content = document.getElementById('content');
-      content.innerHTML = ''; // Limpia el contenido anterior
-      
-      // Filtra los registros por la región seleccionada
-      const filtered = dataGlobal.filter(item => item.Region === region);
-      
-      if(filtered.length === 0) {
-        content.innerHTML = '<p>No hay datos para esta región.</p>';
-        return;
-      }
-      
-      filtered.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'request-item';
-        // Almacena el número de fila en un atributo para usarlo al actualizar
-        div.dataset.row = item.row;
-  
-        // Si el pedido está pendiente, mostramos un botón para marcarlo como "praying"
-        if(item.Status === "pendiente") {
-            div.innerHTML = `
-                <strong>${item.Country}</strong>: ${item['Prayer Requests']}
-                <button class="mark-btn">Start Prayer</button>
-                <span>(pending)</span>
-        `;
-          //iria debajo de button... <span>(${item.Status})</span>
-
-        // El botón "Orar" disparará la función markAsOrando
-        div.querySelector('.mark-btn').addEventListener('click', (e) => {
-            e.stopPropagation(); // Evita que se dispare algún otro evento en el contenedor
-            markAsOrando(item.row);
-        });
-        } else {
-        // Si ya está marcado como praying, se muestra en gris y sin botón
-        div.innerHTML = `
-        <span style="color: grey;"><strong>${item.Country}</strong>: ${item['Prayer Requests']}</span>
-        <span style="color: grey;">(praying)</span>
-    `
-    //esto iria debajo del otro... <span style="color: grey;">(${item.Status})</span>
-    ;
-
-  }
-  
-  content.appendChild(div);
-});
-    }
-    
-    /**
-     * Función para marcar un pedido como "praying".
-     * Envía una petición POST a la API con el número de fila a actualizar.
-     */
-     async function markAsOrando(row) {
-  try {
-    // Actualiza visualmente antes de esperar la respuesta
-    dataGlobal = dataGlobal.map(item => {
-      if (item.row == row) {
-        item.Status = "orando";
-      }
-      return item;
-    });
-
-    // Refresca la UI inmediatamente
-    const activeRegionButton = document.querySelector('#regions button.active');
-    if (activeRegionButton) {
-      displayRegion(activeRegionButton.dataset.region);
-    }
-    updateProgressBar();
-
-    // Ahora se envía la petición al servidor sin bloquear la UI
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      body: JSON.stringify({ row: row }),
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      }
-    });
-
-    const result = await response.json();
-    console.log("Respuesta de la API:", result);
-
-    if (result.result !== "success") {
-      alert(result.message); // Notifica si hay un error
-    }
-
-  } catch (error) {
-    console.error('Error al actualizar:', error);
-  }
-}
-
-    
-    /**
-     * Función para actualizar la barra de progreso global.
-     * Calcula el porcentaje de pedidos marcados como "praying".
-     */
-    function updateProgressBar() {
-      const total = dataGlobal.length;
-      const orandoCount = dataGlobal.filter(item => item.Status === "orando").length;
-      const progressPercent = total > 0 ? (orandoCount / total) * 100 : 0;
-      
-      document.getElementById('progress-bar').style.width = progressPercent + '%';
-      document.getElementById('progress-text').innerText = `${orandoCount} of ${total} covered`;
-    }
-    
-    // Agregar eventos a los botones de regiones
-    document.querySelectorAll('#regions button').forEach(button => {
-      button.addEventListener('click', () => {
-        // Remueve la clase "active" de todos los botones y la asigna al seleccionado
-        document.querySelectorAll('#regions button').forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        displayRegion(button.dataset.region);
-      });
-    });
-    
-    // Se obtiene la información al cargar la página y se refresca cada 10 segundos
-    fetchData();
-    setInterval(fetchData, 10000);
-
-  </script>
+  <!-- Footer Fijo -->
+  <footer>
+    © 2025 Your Company. All rights reserved.
+  </footer>
 </body>
 </html>
+
