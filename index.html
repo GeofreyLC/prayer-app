@@ -149,7 +149,7 @@
     });
   </script>
 <style>
-  /* Evitar scroll global: Solo <main> tendrá scroll */
+  /* ===== Global ===== */
   html, body {
     height: 100%;
     margin: 0;
@@ -157,18 +157,16 @@
     background: #f8f9fa;
     overflow: hidden;
   }
-  body {
-    padding-bottom: 30px;  /* Espacio para el footer fijo */
-  }
+  /* No usamos padding en body, ya que el espacio se controla con los márgenes del main */
 
-  /* ===== HEADER FIJO CON MAPA ANIMADO ===== */
+  /* ===== HEADER FIJO ===== */
   header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     width: 100%;
-    height: 260px; /* Altura del área del mapa */
+    height: 260px; /* Altura fija del header */
     overflow: hidden;
     z-index: 1000;
   }
@@ -191,7 +189,7 @@
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
   }
-  /* Overlay para los controles (título, botones y barra) */
+  /* Overlay (título, botones y barra de progreso) */
   .overlay {
     position: relative;
     z-index: 1;
@@ -264,20 +262,20 @@
     font-size: 12px;
   }
 
-  /* ===== MAIN: Área Desplazable del Contenido ===== */
-  /* Se elimina el posicionamiento absoluto y se usa el flujo normal,
-     reservando un margen superior para que no se solape con el header fijo */
+  /* ===== MAIN: Área Desplazable ===== */
+  /* El main se coloca en el flujo normal, dejando:
+     - un margen superior de 260px (header) + 5px de espacio = 265px
+     - un margen inferior de 40px (footer) + 5px de espacio = 45px */
   main {
-    margin-top: 280px; /* Espacio suficiente por debajo del header (260px + un extra) */
-    margin-bottom: 15px; /* Espacio para el footer fijo */
+    margin-top: 265px;   /* 260px del header + 5px de gap */
+    margin-bottom: 45px; /* 40px del footer + 5px de gap */
     padding: 10px;
     background: #f8f9fa;
     box-sizing: border-box;
     overflow-y: auto;
-    height: calc(100vh - 280px - 15px);
+    height: calc(100vh - 265px - 45px);
   }
-
-  /* Contenedor interno que envuelve las instrucciones y los pedidos */
+  /* Contenedor interno de contenido */
   #content {
     margin: 5px auto;
     max-width: 800px;
@@ -286,8 +284,7 @@
     padding: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
-
-  /* Estilos para la sección de instrucciones */
+  /* ===== Instrucciones ===== */
   #instructions-container {
     background: #fff;
     border: 1px solid #ddd;
@@ -319,7 +316,7 @@
     margin-bottom: 5px;
   }
 
-  /* ===== Modal de Confirmación Personalizado ===== */
+  /* ===== Modal de Confirmación ===== */
   .modal {
     display: none;
     position: fixed;
@@ -359,21 +356,22 @@
     color: #333;
   }
 
-  /* ===== PIE DE PÁGINA (FOOTER) FIJO ===== */
+  /* ===== FOOTER FIJO ===== */
   footer {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
+    height: 40px; /* Altura fija del footer */
     background: #333;
     color: #fff;
     text-align: center;
-    padding: 10px 0;
+    line-height: 40px; /* Centra verticalmente el texto */
     font-size: 10px;
     z-index: 1001;
   }
 
-  /* ===== ESTILOS PARA LAS PETICIONES DE ORACIÓN ===== */
+  /* ===== Estilos para pedidos de oración ===== */
   .request-item {
     background: #ffffff;
     color: #333;
@@ -401,16 +399,16 @@
     background: #218838;
   }
 
-  /* ===== Media Queries ===== */
+  /* ===== Media Queries (Móviles) ===== */
   @media (max-width: 600px) {
     header {
       height: 260px;
     }
     main {
-      margin-top: 280px;
-      margin-bottom: 15px;
+      margin-top: 265px;
+      margin-bottom: 45px;
       padding: 10px;
-      height: calc(100vh - 280px - 15px);
+      height: calc(100vh - 265px - 45px);
     }
     .overlay h1 {
       font-size: 1.6em;
