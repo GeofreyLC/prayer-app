@@ -268,12 +268,12 @@
      - un margen inferior de 40px (footer) + 5px de espacio = 45px */
   main {
     margin-top: 265px;   /* 260px del header + 5px de gap */
-    margin-bottom: 50px; /* 40px del footer + 10px de gap */
+    margin-bottom: 45px; /* 40px del footer + 5px de gap */
     padding: 10px;
     background: #f8f9fa;
     box-sizing: border-box;
     overflow-y: auto;
-    height: calc(100vh - 265px - 50px);
+    height: calc(100vh - 265px - 45px);
   }
   /* Contenedor interno de contenido */
   #content {
@@ -426,6 +426,9 @@
     }
     #content {
       margin: 10px auto;
+    }
+    footer {
+    height: 40px; /* Altura fija del footer */
     }
   }
 </style>
