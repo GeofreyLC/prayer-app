@@ -148,286 +148,289 @@
       fetchData();
     });
   </script>
-  <style>
-    /* Evitar scroll global: Solo main tendrá scroll */
-    html, body {
-      height: 100%;
-      overflow: hidden;
-    }
-    body {
-      font-family: Arial, sans-serif;
-      background: #f8f9fa;
-      padding-bottom: 30px;  /*Espacio para el footer fijo */
-      margin: 0; /* AJUSTE!!! */
-    }
-    /* ===== HEADER FIJO CON MAPA ANIMADO ===== */
+<style>
+  /* Evitar scroll global: Solo <main> tendrá scroll */
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f8f9fa;
+    overflow: hidden;
+  }
+  body {
+    padding-bottom: 30px;  /* Espacio para el footer fijo */
+  }
+
+  /* ===== HEADER FIJO CON MAPA ANIMADO ===== */
+  header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 260px; /* Altura del área del mapa */
+    overflow: hidden;
+    z-index: 1000;
+  }
+  /* Contenedor del mapa animado */
+  #map-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 200%; /* Para la animación horizontal */
+    height: 100%;
+  }
+  #map-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: panLeft 60s linear infinite;
+  }
+  @keyframes panLeft {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  /* Overlay para los controles (título, botones y barra) */
+  .overlay {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: rgba(0,0,0,0.3);
+  }
+  .overlay h1 {
+    font-size: 2em;
+    background: rgba(0,0,0,0.5);
+    padding: 8px 12px;
+    text-align: center;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    color: white;
+  }
+  /* Regiones */
+  #regions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 5px 0;
+  }
+  #regions button {
+    margin: 5px;
+    padding: 12px 20px;
+    font-size: 18px;
+    border: none;
+    background: #215994;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s;
+  }
+  #regions button:hover {
+    background: #08396d;
+  }
+  #regions button.active {
+    background: #4a5b6d;
+  }
+  /* Barra de progreso */
+  #progress-container {
+    width: 90%;
+    max-width: 400px;
+    background: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+    height: 20px;
+    margin-top: 10px;
+  }
+  #progress-bar {
+    height: 100%;
+    background: #28a745;
+    width: 0%;
+    transition: width 0.5s;
+  }
+  #progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgb(27,27,27);
+    font-weight: bold;
+    font-size: 12px;
+  }
+
+  /* ===== MAIN: Área Desplazable del Contenido ===== */
+  /* Se elimina el posicionamiento absoluto y se usa el flujo normal,
+     reservando un margen superior para que no se solape con el header fijo */
+  main {
+    margin-top: 280px; /* Espacio suficiente por debajo del header (260px + un extra) */
+    margin-bottom: 15px; /* Espacio para el footer fijo */
+    padding: 10px;
+    background: #f8f9fa;
+    box-sizing: border-box;
+    overflow-y: auto;
+    height: calc(100vh - 280px - 15px);
+  }
+
+  /* Contenedor interno que envuelve las instrucciones y los pedidos */
+  #content {
+    margin: 5px auto;
+    max-width: 800px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  /* Estilos para la sección de instrucciones */
+  #instructions-container {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 15px;
+    margin-bottom: 5px;
+    text-align: center;
+  }
+  #instructions-container img {
+    display: block;
+    margin: 0 auto 10px auto;
+    max-width: 100px;
+  }
+  #instructions-container h2 {
+    margin-bottom: 10px;
+    font-size: 1.5em;
+    color: #333;
+  }
+  #instructions-container ul {
+    list-style: none;
+    padding: 0;
+    font-size: 16px;
+    color: #555;
+    text-align: left;
+    display: inline-block;
+  }
+  #instructions-container ul li {
+    margin-bottom: 5px;
+  }
+
+  /* ===== Modal de Confirmación Personalizado ===== */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1100;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 400px;
+    width: 80%;
+  }
+  .modal-buttons {
+    margin-top: 20px;
+  }
+  .modal-buttons button {
+    margin: 0 10px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  #modal-yes {
+    background: #28a745;
+    color: #fff;
+  }
+  #modal-no {
+    background: #ccc;
+    color: #333;
+  }
+
+  /* ===== PIE DE PÁGINA (FOOTER) FIJO ===== */
+  footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 10px;
+    z-index: 1001;
+  }
+
+  /* ===== ESTILOS PARA LAS PETICIONES DE ORACIÓN ===== */
+  .request-item {
+    background: #ffffff;
+    color: #333;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .request-item:hover {
+    background: #f1f1f1;
+  }
+  .mark-btn {
+    margin-left: 10px;
+    padding: 5px 10px;
+    border: none;
+    background: #28a745;
+    color: white;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .mark-btn:hover {
+    background: #218838;
+  }
+
+  /* ===== Media Queries ===== */
+  @media (max-width: 600px) {
     header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      width: 100%;
-      height: 260px; /* Altura del área del mapa */
-      overflow: hidden;
-      z-index: 1000;
+      height: 260px;
     }
-    /* Contenedor del mapa animado */
-    #map-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      width: 200%; /* Para la animación horizontal */
-      height: 100%;
-    }
-    #map-container img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      animation: panLeft 60s linear infinite;
-    }
-    @keyframes panLeft {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
-    }
-    /* Overlay para los controles (título, botones y barra) */
-    .overlay {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      background: rgba(0,0,0,0.3);      
+    main {
+      margin-top: 280px;
+      margin-bottom: 15px;
+      padding: 10px;
+      height: calc(100vh - 280px - 15px);
     }
     .overlay h1 {
-      font-size: 2em;
-      background: rgba(0,0,0,0.5);
-      padding: 8px 12px;
-      text-align: center;
-      border-radius: 5px;
-      margin-bottom: 10px;
-      color: white;
+      font-size: 1.6em;
     }
-    #regions {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin: 5px 0;
-    }
-    /* Botones más grandes */
     #regions button {
-      margin: 5px;
-      padding: 12px 20px;
-      font-size: 18px;
-      border: none;
-      background: #215994;
-      color: white;
-      cursor: pointer;
-      border-radius: 5px;
-      transition: background 0.3s;
+      margin: 4px;
+      padding: 10px 16px;
+      font-size: 16px;
     }
-    #regions button:hover {
-      background: #08396d;
-    }
-    #regions button.active {
-      background: #4a5b6d;
-    }
-    /* Barra de progreso */
     #progress-container {
-      width: 90%;
-      max-width: 400px;
-      background: #e0e0e0;
-      border-radius: 5px;
-      overflow: hidden;
-      position: relative;
       height: 20px;
-      margin-top: 10px;
-    }
-    #progress-bar {
-      height: 100%;
-      background: #28a745;
-      width: 0%;
-      transition: width 0.5s;
     }
     #progress-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: rgb(27,27,27);
-      font-weight: bold;
       font-size: 12px;
     }
-    /* ===== MAIN: Área Desplazable del Contenido ===== */
-    main {
-      position: absolute;
-      top: 300px;    /* 20px extra de separación debajo del header (240px + 10px) */
-      bottom: 15px;  /* 60px del footer fijo */ /* AJUSTEE!!! */ 
-      left: 0;
-      right: 0;
-      overflow-y: auto;
-      padding: 10px;  /* Padding interno pequeño */
-      background: #f8f9fa;
-      box-sizing: border-box; /* Para no incluir el padding en el cálculo de tamaño *//* AJUSTEE!!! */ 
-    }
-    /* Contenedor interno que envuelve las instrucciones y los pedidos */
     #content {
-      margin-top: 300px; /*era 250 pero depende de la cabezera...*/ 
-      margin-left: auto;
-      margin-right: auto;
-
-      background: #fff;
-      border-radius: 8px;
-      padding: 5px;
-      margin: 5px auto; /* Margen vertical reducido */
-      max-width: 800px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin: 10px auto;
     }
-
-    /* Estilos para la sección de instrucciones */
-    #instructions-container {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      padding: 15px;
-      margin-bottom: 5px;
-      text-align: center;
-    }
-    #instructions-container img {
-      display: block;
-      margin: 0 auto 10px auto;
-      max-width: 100px;
-    }
-    #instructions-container h2 {
-      margin-bottom: 10px;
-      font-size: 1.5em;
-      color: #333;
-    }
-    #instructions-container ul {
-      list-style: none;
-      padding: 0;
-      font-size: 16px;
-      color: #555;
-      text-align: left;
-      display: inline-block;
-    }
-    #instructions-container ul li {
-      margin-bottom: 5px;
-    }
-    /* ===== Modal de Confirmación Personalizado ===== */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 1100;
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      text-align: center;
-      max-width: 400px;
-      width: 80%;
-    }
-    .modal-buttons {
-      margin-top: 20px;
-    }
-    .modal-buttons button {
-      margin: 0 10px;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    #modal-yes {
-      background: #28a745;
-      color: #fff;
-    }
-    #modal-no {
-      background: #ccc;
-      color: #333;
-    }
-    /* ===== PIE DE PÁGINA (FOOTER) FIJO ===== */
-    footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: #333;
-      color: #fff;
-      text-align: center;
-      padding: 10px 0;
-      font-size: 10px;
-      z-index: 1001;
-    }
-    /* ===== ESTILOS PARA LAS PETICIONES DE ORACIÓN ===== */
-    .request-item {
-      background: #ffffff;
-      color: #333;
-      margin: 10px 0;
-      padding: 10px;
-      border-radius: 5px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .request-item:hover {
-      background: #f1f1f1;
-    }
-    .mark-btn {
-      margin-left: 10px;
-      padding: 5px 10px;
-      border: none;
-      background: #28a745;
-      color: white;
-      border-radius: 3px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .mark-btn:hover {
-      background: #218838;
-    }
-    /* ===== Media Queries ===== */
-    @media (max-width: 600px) {
-      header {
-        height: 260px;
-      }
-      main {
-        top: 280px;
-        bottom: 15px;
-        height: calc(100vh - 280px - 15px);
-        padding: 10px;
-      }
-      .overlay h1 {
-        font-size: 1.6em;
-      }
-      #regions button {
-        margin: 4px;
-        padding: 10px 16px;
-        font-size: 16px;
-      }
-      #progress-container {
-        height: 20px;
-      }
-      #progress-text {
-        font-size: 12px;
-      }
-      #content {
-        margin: 10px auto;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
   <header>
