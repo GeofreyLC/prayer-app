@@ -121,7 +121,7 @@
       const orandoCount = dataGlobal.filter(item => item.Status === "orando").length;
       const progressPercent = total > 0 ? (orandoCount / total) * 100 : 0;
       document.getElementById("progress-bar").style.width = progressPercent + "%";
-      document.getElementById("progress-text").innerText = `${orandoCount} of ${total} covered`;
+      document.getElementById("progress-text").innerText = `${orandoCount}/${total} countries prayed for`;
     }
 
     // Configurar eventos en los botones de regiones y el modal de confirmación
@@ -241,7 +241,7 @@
     max-width: 400px;
     background: #e0e0e0;
     border-radius: 5px;
-    overflow: hidden;
+    /*overflow: hidden;*/
     position: relative;
     height: 20px;
     margin-top: 10px;
@@ -366,7 +366,7 @@
     background: #333;
     color: #fff;
     text-align: center;
-    line-height: 30px; /* Centra verticalmente el texto */
+    line-height: 40px; /* Centra verticalmente el texto */
     font-size: 8px;
     z-index: 1001;
   }
@@ -429,7 +429,7 @@
     }
     footer {
     position: fixed;
-    height: 30px; /* Altura fija del footer */
+    /*height: 30px; /* Altura fija del footer */
     }
   }
 </style>
