@@ -9,11 +9,11 @@
   <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
   <link rel="manifest" href="images/site.webmanifest">
   <script type="module">
-    // Importar Firebase y Firestore
+ 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
     import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-    // Configuración de Firebase
+    // Configuración de Firebase (NO OLVIDAR LUEGO CAMBIAR PERMISOSSSSSSS)
     const firebaseConfig = {
       apiKey: "AIzaSyDkLid9IYVjE8fQkznAZ5KQB0rAg127xqA",
       authDomain: "prayer-request-app-8b013.firebaseapp.com",
@@ -24,14 +24,13 @@
       measurementId: "G-M670R2NM75"
     };
 
-    // Inicializar Firebase y Firestore
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
     let dataGlobal = [];
-    let currentPrayerId = null; // Para almacenar temporalmente el id del pedido que se va a marcar
+    let currentPrayerId = null; // almacenar temporalmente el id del pedido que se va a marcar!
 
-    // Obtener datos en tiempo real desde Firestore
+    // obtener datos en tiempo real desde Firestore
     function fetchData() {
       onSnapshot(collection(db, "tus-datos"), (snapshot) => {
         dataGlobal = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -43,14 +42,11 @@
       });
     }
 
-    // Mostrar pedidos de oración por región (ordenados alfabéticamente por país)
     function displayRegion(region) {
       const content = document.getElementById("content");
-      // Al seleccionar una región se elimina la sección de instrucciones
       content.innerHTML = "";
 
       let filtered = dataGlobal.filter(item => item.Region === region);
-      // Ordenar alfabéticamente por el nombre del país
       filtered.sort((a, b) => a.Country.localeCompare(b.Country));
 
       if (filtered.length === 0) {
@@ -69,7 +65,7 @@
             <button class="mark-btn">Start Praying</button>
             <span>(pending)</span>
           `;
-          // Se muestra el modal de confirmación personalizado
+          // para confirmar... IRREVERSIBLE!!!
           div.querySelector(".mark-btn").addEventListener("click", (e) => {
             e.stopPropagation();
             currentPrayerId = item.id;
@@ -86,24 +82,22 @@
       });
     }
 
-    // Función para mostrar el modal de confirmación
     function showConfirmationModal() {
       const modal = document.getElementById("confirmation-modal");
       modal.style.display = "flex";
     }
 
-    // Función para ocultar el modal
     function hideConfirmationModal() {
       const modal = document.getElementById("confirmation-modal");
       modal.style.display = "none";
     }
 
-    // Marcar pedido como "orando" en Firestore
+    // marcar pedido como "orando" en Firestore
     async function markAsOrando(id) {
       try {
         const prayerRef = doc(db, "tus-datos", id);
         await updateDoc(prayerRef, { Status: "orando" });
-        // Actualizar la UI instantáneamente
+        // actualizar la UI instantáneamente
         dataGlobal = dataGlobal.map(item => (item.id === id ? { ...item, Status: "orando" } : item));
         const activeRegionButton = document.querySelector("#regions button.active");
         if (activeRegionButton) {
@@ -115,7 +109,7 @@
       }
     }
 
-    // Actualizar la barra de progreso
+    // actualizar la barra
     function updateProgressBar() {
       const total = dataGlobal.length;
       const orandoCount = dataGlobal.filter(item => item.Status === "orando").length;
@@ -124,7 +118,7 @@
       document.getElementById("progress-text").innerText = `${orandoCount}/${total} countries prayed for`;
     }
 
-    // Configurar eventos en los botones de regiones y el modal de confirmación
+    // configurar eventos en los botones de regiones y el modal de confirmación
     document.addEventListener("DOMContentLoaded", () => {
       document.querySelectorAll("#regions button").forEach(button => {
         button.addEventListener("click", () => {
@@ -134,7 +128,7 @@
         });
       });
 
-      // Eventos para el modal de confirmación
+      // eventos para el modal de confirmación
       document.getElementById("modal-yes").addEventListener("click", () => {
         if (currentPrayerId) {
           markAsOrando(currentPrayerId);
@@ -148,8 +142,9 @@
       fetchData();
     });
   </script>
+
 <style>
-  /* ===== Global ===== */
+  /* global */
   html, body {
     height: 100%;
     margin: 0;
@@ -158,7 +153,7 @@
     overflow: hidden;
   }
 
-  /* ===== HEADER FIJO ===== */
+  /* la cabecera fija */
   header {
     position: fixed;
     top: 0;
@@ -270,7 +265,7 @@
     font-size: 10px;
   }
 
-  /* ===== MAIN: Área Desplazable Fija ===== */
+  /* main desplazable fijo mejor */
   main {
     position: fixed;
     top: 180px;
@@ -292,7 +287,7 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
 
-  /* ===== Instrucciones ===== */
+  /* instrucciones del inicio... */
   #instructions-container {
     background: #fff;
     border: 1px solid #ddd;
@@ -328,7 +323,7 @@
     margin-bottom: 5px;
   }
 
-  /* ===== Modal de Confirmación ===== */
+  /* la confirmación del pedido */
   .modal {
     display: none;
     position: fixed;
@@ -373,7 +368,7 @@
     color: #333;
   }
 
-  /* ===== FOOTER FIJO ===== */
+  /* mi footer fijo */
   footer {
     position: fixed;
     bottom: 0;
@@ -388,7 +383,7 @@
     z-index: 1001;
   }
 
-  /* ===== Estilos para pedidos de oración ===== */
+  /* pedidos de oración */
   .request-item {
     background: #ffffff;
     color: #333;
@@ -420,7 +415,7 @@
     background: #218838;
   }
 
-  /* ===== Media Queries (Ajustes para móviles en horizontal) ===== */
+  /* media queries (ajustar para horizontal en celus) */
   @media (max-height: 600px) and (orientation: landscape) {
     header {
       height: 120px;
@@ -495,7 +490,6 @@
   </header>
   <main>
     <div id="content" class="content-container scrollable-container">
-      <!-- Sección de instrucciones inicial -->
       <div id="instructions-container">
         <img src="https://raw.githubusercontent.com/GeofreyLC/prayer-app/refs/heads/main/Who%20Else%20-%20Logo.png" alt="Logo">
         <h2>Instructions:</h2>
@@ -504,11 +498,11 @@
           <li>- Don't forget to mark the country/countries you have started praying for with the "Start Praying" button.</li>
         </ul>
       </div>
-      <!-- Aquí se mostrarán los pedidos de oración tras seleccionar una región -->
+      <!-- AREA PARA TODOS LOS PEDIDOS!!! -->
     </div>
 
   </main>
-  <!-- Modal de Confirmación Personalizado -->
+  <!-- modal de confirmación si es q quieren orar o no -->
   <div id="confirmation-modal" class="modal">
     <div class="modal-content">
       <p>Do you commit to pray for this country? If you select "Yes", you will not be able to undo this.</p>
@@ -518,11 +512,8 @@
       </div>
     </div>
   </div>
-  <!-- Footer Fijo -->
   <footer>
     © 2025 GeofreyLC | Prayer Map developed for GSLMF 25'.
   </footer>
 </body>
 </html>
-
-
