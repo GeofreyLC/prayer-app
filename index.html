@@ -156,6 +156,9 @@
     font-family: Arial, sans-serif;
     background: #f8f9fa;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
   }
   /* No usamos padding en body, ya que el espacio se controla con los márgenes del main */
 
@@ -268,12 +271,12 @@
      - un margen inferior de 40px (footer) + 5px de espacio = 45px */
   main {
     margin-top: 265px;   /* 260px del header + 5px de gap */
-    margin-bottom: 45px; /* 40px del footer + 5px de gap */
+    /*margin-bottom: 45px;  40px del footer + 5px de gap */
     padding: 10px;
     background: #f8f9fa;
     box-sizing: border-box;
     overflow-y: auto;
-    height: calc(100vh - 265px - 45px);
+    height: calc(100vh - 265px);
   }
   /* Contenedor interno de contenido */
   #content {
@@ -358,7 +361,7 @@
 
   /* ===== FOOTER FIJO ===== */
   footer {
-    position: fixed;
+    /*position: fixed;*/
     bottom: 0;
     left: 0;
     width: 100%;
@@ -369,6 +372,7 @@
     line-height: 40px; /* Centra verticalmente el texto */
     font-size: 8px;
     z-index: 1001;
+    margin-top: auto;
   }
 
   /* ===== Estilos para pedidos de oración ===== */
@@ -406,9 +410,10 @@
     }
     main {
       margin-top: 265px;
-      margin-bottom: 50px;
+      /*margin-bottom: 50px;*/
       padding: 10px;
-      height: calc(100vh - 265px - 50px);
+      /*height: calc(100vh - 265px - 50px);*/
+      height: calc(100vh - 265px);
     }
     .overlay h1 {
       font-size: 1.6em;
@@ -429,8 +434,8 @@
       margin-bottom: 15px;
     }
     footer {
-    position: fixed;
-    /*height: 30px; /* Altura fija del footer */
+    /*position: fixed;*/
+    height: 30px; /* Altura fija del footer */
     }
   }
 </style>
@@ -488,4 +493,5 @@
   </footer>
 </body>
 </html>
+
 
