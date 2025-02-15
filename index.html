@@ -157,7 +157,6 @@
     background: #f8f9fa;
     overflow: hidden;
   }
-  /* No usamos padding en body, ya que el espacio se controla con los márgenes del main */
 
   /* ===== HEADER FIJO ===== */
   header {
@@ -166,30 +165,33 @@
     left: 0;
     right: 0;
     width: 100%;
-    height: 260px; /* Altura fija del header */
+    height: 180px;
     overflow: hidden;
     z-index: 1000;
   }
-  /* Contenedor del mapa animado */
+
   #map-container {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    width: 200%; /* Para la animación horizontal */
+    width: 200%;
     height: 100%;
   }
+
   #map-container img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     animation: panLeft 60s linear infinite;
+    will-change: transform;
   }
+
   @keyframes panLeft {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
   }
-  /* Overlay (título, botones y barra de progreso) */
+
   .overlay {
     position: relative;
     z-index: 1;
@@ -201,27 +203,29 @@
     align-items: center;
     text-align: center;
     background: rgba(0,0,0,0.3);
+    padding: 5px;
   }
+
   .overlay h1 {
-    font-size: 2em;
+    font-size: 1.5em;
     background: rgba(0,0,0,0.5);
-    padding: 8px 12px;
-    text-align: center;
+    padding: 6px 10px;
     border-radius: 5px;
-    margin-bottom: 10px;
+    margin: 5px 0;
     color: white;
   }
-  /* Regiones */
+
   #regions {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    margin: 5px 0;
+    margin: 3px 0;
   }
+
   #regions button {
-    margin: 5px;
-    padding: 12px 20px;
-    font-size: 18px;
+    margin: 3px;
+    padding: 8px 12px;
+    font-size: 14px;
     border: none;
     background: #215994;
     color: white;
@@ -229,29 +233,33 @@
     border-radius: 5px;
     transition: background 0.3s;
   }
+
   #regions button:hover {
     background: #08396d;
   }
+
   #regions button.active {
     background: #4a5b6d;
   }
-  /* Barra de progreso */
+
   #progress-container {
-    width: 90%;
-    max-width: 400px;
+    width: 95%;
+    max-width: 350px;
     background: #e0e0e0;
     border-radius: 5px;
     overflow: hidden;
     position: relative;
-    height: 20px;
-    margin-top: 10px;
+    height: 18px;
+    margin: 8px 0;
   }
+
   #progress-bar {
     height: 100%;
     background: #28a745;
     width: 0%;
     transition: width 0.5s;
   }
+
   #progress-text {
     position: absolute;
     top: 50%;
@@ -259,23 +267,22 @@
     transform: translate(-50%, -50%);
     color: rgb(27,27,27);
     font-weight: bold;
-    font-size: 12px;
+    font-size: 10px;
   }
 
-  /* ===== MAIN: Área Desplazable ===== */
-  /* El main se coloca en el flujo normal, dejando:
-     - un margen superior de 260px (header) + 5px de espacio = 265px
-     - un margen inferior de 40px (footer) + 5px de espacio = 45px */
+  /* ===== MAIN: Área Desplazable Fija ===== */
   main {
-    margin-top: 265px;   /* 260px del header + 5px de gap */
-    margin-bottom: 45px; /* 40px del footer + 5px de gap */
-    padding: 10px;
-    background: #f8f9fa;
-    box-sizing: border-box;
+    position: fixed;
+    top: 180px;
+    bottom: 35px;
+    left: 0;
+    right: 0;
+    padding: 8px;
     overflow-y: auto;
-    height: calc(100vh - 265px - 45px);
+    background: #f8f9fa;
+    z-index: 999;
   }
-  /* Contenedor interno de contenido */
+
   #content {
     margin: 5px auto;
     max-width: 800px;
@@ -284,6 +291,7 @@
     padding: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
+
   /* ===== Instrucciones ===== */
   #instructions-container {
     background: #fff;
@@ -294,16 +302,19 @@
     margin-bottom: 5px;
     text-align: center;
   }
+
   #instructions-container img {
     display: block;
     margin: 0 auto 10px auto;
     max-width: 100px;
   }
+
   #instructions-container h2 {
     margin-bottom: 10px;
     font-size: 1.5em;
     color: #333;
   }
+
   #instructions-container ul {
     list-style: none;
     padding: 0;
@@ -312,6 +323,7 @@
     text-align: left;
     display: inline-block;
   }
+
   #instructions-container ul li {
     margin-bottom: 5px;
   }
@@ -329,6 +341,7 @@
     justify-content: center;
     align-items: center;
   }
+
   .modal-content {
     background: #fff;
     padding: 20px;
@@ -337,9 +350,11 @@
     max-width: 400px;
     width: 80%;
   }
+
   .modal-buttons {
     margin-top: 20px;
   }
+
   .modal-buttons button {
     margin: 0 10px;
     padding: 8px 16px;
@@ -347,10 +362,12 @@
     border-radius: 4px;
     cursor: pointer;
   }
+
   #modal-yes {
     background: #28a745;
     color: #fff;
   }
+
   #modal-no {
     background: #ccc;
     color: #333;
@@ -362,12 +379,12 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 40px; /* Altura fija del footer */
+    height: 35px;
     background: #333;
     color: #fff;
     text-align: center;
-    line-height: 40px; /* Centra verticalmente el texto */
-    font-size: 8px;
+    line-height: 35px;
+    font-size: 7px;
     z-index: 1001;
   }
 
@@ -381,10 +398,13 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     cursor: pointer;
     transition: background 0.3s;
+    word-break: break-word;
   }
+
   .request-item:hover {
     background: #f1f1f1;
   }
+
   .mark-btn {
     margin-left: 10px;
     padding: 5px 10px;
@@ -395,42 +415,58 @@
     cursor: pointer;
     transition: background 0.3s;
   }
+
   .mark-btn:hover {
     background: #218838;
   }
 
-  /* ===== Media Queries (Móviles) ===== */
-  @media (max-width: 600px) {
+  /* ===== Media Queries (Ajustes para móviles en horizontal) ===== */
+  @media (max-height: 600px) and (orientation: landscape) {
     header {
-      height: 260px;
+      height: 120px;
     }
-    main {
-      margin-top: 265px;
-      margin-bottom: 50px;
-      padding: 10px;
-      height: calc(100vh - 265px - 50px);
-    }
+
     .overlay h1 {
-      font-size: 1.6em;
+      font-size: 1.2em;
+      padding: 4px 8px;
+      margin: 2px 0;
     }
+
     #regions button {
-      margin: 4px;
-      padding: 10px 16px;
-      font-size: 16px;
-    }
-    #progress-container {
-      height: 20px;
-    }
-    #progress-text {
+      padding: 6px 10px;
       font-size: 12px;
+      margin: 2px;
     }
-    #content {
-      margin: 10px auto;
-      margin-bottom: 15px;
+
+    #progress-container {
+      max-width: 300px;
+      height: 15px;
+      margin: 5px 0;
     }
+
+    #progress-text {
+      font-size: 9px;
+    }
+
+    main {
+      top: 120px;
+      bottom: 30px;
+    }
+
     footer {
-    /*position: fixed;*/
-    /*height: 30px; /* Altura fija del footer */
+      height: 30px;
+      line-height: 30px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .overlay h1 {
+      font-size: 1.3em;
+    }
+    
+    #regions button {
+      padding: 6px 10px;
+      font-size: 13px;
     }
   }
 </style>
