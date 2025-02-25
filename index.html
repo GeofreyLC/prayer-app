@@ -3,11 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+
   <title>Who else can pray for the nations?</title>
   <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
   <link rel="manifest" href="images/site.webmanifest">
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
   <script type="module">
  
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
@@ -144,16 +149,21 @@
   </script>
 
 <style>
-  /* global */
+  /* ===== GLOBAL ===== */
   html, body {
     height: 100%;
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', Arial, sans-serif;
     background: #f8f9fa;
     overflow: hidden;
   }
 
-  /* la cabecera fija */
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ===== HEADER ===== */
   header {
     position: fixed;
     top: 0;
@@ -201,32 +211,37 @@
     padding: 5px;
   }
 
-  .overlay h1 {
-    font-size: 1.5em;
+  .overlay a {
+    font-size: clamp(1.1rem, 3vw, 1.4rem);
     background: rgba(0,0,0,0.5);
     padding: 6px 10px;
     border-radius: 5px;
     margin: 5px 0;
     color: white;
+    font-weight: 530;
+    text-decoration: none;
   }
 
+  /* ===== REGIONES ===== */
   #regions {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     margin: 3px 0;
+    gap: 4px;
   }
 
   #regions button {
-    margin: 3px;
     padding: 8px 12px;
-    font-size: 14px;
+    font-size: clamp(0.65rem, 2vw, 0.75rem);
     border: none;
     background: #215994;
     color: white;
     cursor: pointer;
     border-radius: 5px;
     transition: background 0.3s;
+    flex: 1 0 auto;
+    margin: 3px;
   }
 
   #regions button:hover {
@@ -237,15 +252,16 @@
     background: #4a5b6d;
   }
 
+  /* ===== BARRA DE PROGRESO ===== */
   #progress-container {
     width: 95%;
-    max-width: 350px;
+    max-width: 90%;
     background: #e0e0e0;
     border-radius: 5px;
     overflow: hidden;
     position: relative;
     height: 18px;
-    margin: 8px 0;
+    margin: 8px auto;
   }
 
   #progress-bar {
@@ -260,12 +276,13 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: rgb(27,27,27);
+    color: #1b1b1b;
     font-weight: bold;
-    font-size: 10px;
+    font-size: clamp(0.6rem, 2vw, 0.65rem);
+    white-space: nowrap;
   }
 
-  /* main desplazable fijo mejor */
+  /* ===== MAIN CONTENIDO ===== */
   main {
     position: fixed;
     top: 180px;
@@ -287,14 +304,14 @@
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   }
 
-  /* instrucciones del inicio... */
+  /* ===== INSTRUCCIONES ===== */
   #instructions-container {
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    padding: 15px;
-    margin-bottom: 5px;
+    padding: 12px;
+    margin: 0 10px 15px;
     text-align: center;
   }
 
@@ -302,28 +319,66 @@
     display: block;
     margin: 0 auto 10px auto;
     max-width: 100px;
+    height: auto;
   }
 
   #instructions-container h2 {
     margin-bottom: 10px;
-    font-size: 1.5em;
-    color: #333;
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+    color: #2c3e50;
+    position: relative;
+  }
+
+  #instructions-container h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: #28a745;
+    border-radius: 2px;
   }
 
   #instructions-container ul {
     list-style: none;
     padding: 0;
-    font-size: 16px;
-    color: #555;
+    font-size: clamp(0.75rem, 2vw, 0.8rem);
     text-align: left;
-    display: inline-block;
+    display: block;
+    color: #4a5568;
+    width: 100%;
   }
 
   #instructions-container ul li {
-    margin-bottom: 5px;
+    margin-bottom: 8px;
+    padding: 8px 15px;
+    background: rgba(241, 243, 245, 0.5);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: block;
+    word-break: break-word;
+    hyphens: auto;
   }
 
-  /* la confirmación del pedido */
+  #instructions-container ul li::before {
+    content: '✝';
+    font-size: 1rem;
+    color: #53815e;
+    margin-right: 8px;
+  }
+
+  .motivational-text {
+    font-style: italic;
+    color: #4a5568;
+    margin-top: 10px;
+    padding-top: 7px;
+    font-size: 0.7rem;
+    display: block;
+  }
+
+  /* ===== MODAL ===== */
   .modal {
     display: none;
     position: fixed;
@@ -368,7 +423,7 @@
     color: #333;
   }
 
-  /* mi footer fijo */
+  /* ===== FOOTER ===== */
   footer {
     position: fixed;
     bottom: 0;
@@ -383,7 +438,7 @@
     z-index: 1001;
   }
 
-  /* pedidos de oración */
+  /* ===== PEDIDOS DE ORACIÓN ===== */
   .request-item {
     background: #ffffff;
     color: #333;
@@ -392,12 +447,13 @@
     border-radius: 5px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     cursor: pointer;
-    transition: background 0.3s;
+    transition: all 0.3s ease;
     word-break: break-word;
   }
 
   .request-item:hover {
     background: #f1f1f1;
+    transform: scale(1.02);
   }
 
   .mark-btn {
@@ -415,32 +471,19 @@
     background: #218838;
   }
 
-  /* media queries (ajustar para horizontal en celus) */
+  /* ===== MEDIA QUERIES ===== */
   @media (max-height: 600px) and (orientation: landscape) {
     header {
       height: 120px;
     }
 
-    .overlay h1 {
-      font-size: 1.2em;
-      padding: 4px 8px;
-      margin: 2px 0;
+    .overlay a {
+      font-size: 1rem;
     }
 
     #regions button {
       padding: 6px 10px;
-      font-size: 12px;
-      margin: 2px;
-    }
-
-    #progress-container {
-      max-width: 300px;
-      height: 15px;
-      margin: 5px 0;
-    }
-
-    #progress-text {
-      font-size: 9px;
+      font-size: 0.65rem;
     }
 
     main {
@@ -455,14 +498,58 @@
   }
 
   @media (max-width: 480px) {
-    .overlay h1 {
-      font-size: 1.3em;
+    #instructions-container {
+      padding: 10px;
+      margin: 0 8px 12px;
     }
-    
+
+    #instructions-container ul li {
+      padding: 6px 12px;
+    }
+  }
+
+  @media (max-width: 375px) {
+    .overlay a {
+      padding: 4px 8px;
+    }
+
     #regions button {
-      padding: 6px 10px;
-      font-size: 13px;
+      padding: 5px 8px;
     }
+
+    #progress-text {
+      font-size: 0.55rem;
+    }
+  }
+
+  @media (max-width: 320px) {
+    #regions button {
+      padding: 4px 6px;
+      font-size: 0.6rem;
+    }
+
+    #instructions-container h2::after {
+      width: 40px;
+      bottom: -5px;
+    }
+  }
+
+  /* ===== ANIMACIONES ===== */
+  @keyframes checkmark {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  .marked-check {
+    display: inline-block;
+    margin-left: 8px;
+    animation: checkmark 0.3s ease-out;
+    color: #28a745;
+  }
+
+  .request-item[data-status="orando"] {
+    border-left: 4px solid #28a745;
   }
 </style>
 </head>
@@ -472,7 +559,7 @@
       <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg" alt="Map Background">
     </div>
     <div class="overlay">
-      <h1>Who else can pray for the nations?</h1>
+      <a href="https://geofreylc.github.io/prayer-app/">Who else can pray for the nations?</a>
       <nav id="regions">
         <button data-region="Africa">Africa</button>
         <button data-region="East Asia">East Asia</button>
@@ -492,11 +579,12 @@
     <div id="content" class="content-container scrollable-container">
       <div id="instructions-container">
         <img src="https://raw.githubusercontent.com/GeofreyLC/prayer-app/refs/heads/main/Who%20Else%20-%20Logo.png" alt="Logo">
-        <h2>Instructions:</h2>
         <ul>
-          <li>- Select a region to access the list of countries you can start praying for.</li>
-          <li>- Don't forget to mark the country/countries you have started praying for with the "Start Praying" button.</li>
+          <li><strong>Select a region</strong> to access the list of countries you can start praying for.</li>
+          <li>Don't forget to <strong>mark the country</strong> you have started praying for with the <strong>"Start Praying"</strong> button.</li>
+          <li>You can always return to the <strong>home page</strong> by clicking on <strong>"Who Else can pray for the nations?"</strong></li>
         </ul>
+        <p class="motivational-text">"Prayer is the key that opens the heart of God" - Charles Spurgeon</p>
       </div>
       <!-- AREA PARA TODOS LOS PEDIDOS!!! -->
     </div>
