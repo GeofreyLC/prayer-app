@@ -35,6 +35,47 @@
     let dataGlobal = [];
     let currentPrayerId = null; // almacenar temporalmente el id del pedido que se va a marcar!
 
+    // Alert de seguridad
+    document.addEventListener("DOMContentLoaded", () => {
+      alert("Please DO NOT share these prayer requests with other people, as we have sensitive information about some countries. This is exclusively for the GSLM Forum '25. You may not have access to copy information from this page.");
+
+      // Protecciones contra copia
+      document.addEventListener('contextmenu', (e) => e.preventDefault());
+      document.addEventListener('dragstart', (e) => e.preventDefault());
+      document.addEventListener('copy', (e) => {
+        e.clipboardData.setData('text/plain', 'Content protected');
+        e.preventDefault();
+      });
+
+      // Overlay anti-screenshots
+      const overlay = document.createElement('div');
+      overlay.className = 'no-screenshot';
+      document.body.appendChild(overlay);
+
+      //........
+      document.querySelectorAll("#regions button").forEach(button => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll("#regions button").forEach(btn => btn.classList.remove("active"));
+          button.classList.add("active");
+          displayRegion(button.dataset.region);
+        });
+      });
+
+      document.getElementById("modal-yes").addEventListener("click", () => {
+        if (currentPrayerId) {
+          markAsOrando(currentPrayerId);
+        }
+        hideConfirmationModal();
+      });
+      document.getElementById("modal-no").addEventListener("click", () => {
+        hideConfirmationModal();
+      });
+
+      fetchData();
+    });
+
+
+
     // obtener datos en tiempo real desde Firestore
     function fetchData() {
       onSnapshot(collection(db, "tus-datos"), (snapshot) => {
@@ -122,33 +163,26 @@
       document.getElementById("progress-bar").style.width = progressPercent + "%";
       document.getElementById("progress-text").innerText = `${orandoCount}/${total} countries prayed for`;
     }
-
-    // configurar eventos en los botones de regiones y el modal de confirmación
-    document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll("#regions button").forEach(button => {
-        button.addEventListener("click", () => {
-          document.querySelectorAll("#regions button").forEach(btn => btn.classList.remove("active"));
-          button.classList.add("active");
-          displayRegion(button.dataset.region);
-        });
-      });
-
-      // eventos para el modal de confirmación
-      document.getElementById("modal-yes").addEventListener("click", () => {
-        if (currentPrayerId) {
-          markAsOrando(currentPrayerId);
-        }
-        hideConfirmationModal();
-      });
-      document.getElementById("modal-no").addEventListener("click", () => {
-        hideConfirmationModal();
-      });
-
-      fetchData();
-    });
   </script>
 
 <style>
+  /* Prevenir selección de texto */
+  * {
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    
+    /* Overlay anti-screenshots */
+    .no-screenshot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
   /* ===== GLOBAL ===== */
   html, body {
     height: 100%;
